@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    android:background="#D6EDFF"
+
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="    " />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <com.example.minesweeper.ui.mapView
+            android:id="@+id/ticView"
+            android:layout_width="350dp"
+            android:layout_height="350dp" />
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="102dp"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textOff="Try"
+        android:textOn="Flagg"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+</LinearLayout>
