@@ -7,17 +7,27 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.example.minesweeper.MainActivity
-import com.example.minesweeper.R
 import com.example.minesweeper.model.mapViewModel
+
+//TODO
+// 2. draw the letters
+// 3. make the toggle button make sense
+// 4. put flaggs (change the background)
+// 5. if there is a mine draw another background
+// 6. end game if there is a mine
+// 7. put some icons (flaggs, mines)
+// 8. play with the styles
+
 
 class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     var paintBackground = Paint()
     var paintLine = Paint()
     var paintText = Paint()
+    var paintBackgroundClicked = Paint()
 
     init {
-        paintBackground.color = Color.argb(255,255, 227, 220)
+        paintBackground.color = Color.rgb(255, 227, 220)
         paintBackground.style = Paint.Style.FILL
 
         paintLine.color = Color.WHITE
@@ -26,6 +36,9 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
         paintText.color = Color.GREEN
         paintText.textSize = 60f
+
+        paintBackgroundClicked.color = Color.rgb(129, 240, 229)
+        paintBackgroundClicked.style = Paint.Style.FILL
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -44,6 +57,32 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         //canvas?.drawText("3", width/2f, height/2f, paintText)
 
         drawBoard(canvas)
+        drawClickedTiles(canvas)
+    }
+
+    private fun drawClickedTiles(canvas: Canvas) {
+        //Y
+        val tileHeight = height.toFloat()/5
+        //X
+        val tileWidth = width.toFloat()/5
+        val matrix = mapViewModel.fieldMatrix
+
+        for(row_index in matrix.indices){
+            var row = matrix[row_index]
+            for (column_index in row.indices){
+                //draw filled rect
+                if(!matrix[row_index][column_index].wasClicked)
+                    continue
+
+                val left = (row_index * tileWidth)
+                val right = ((row_index + 1) * tileWidth)
+                val top = (column_index * tileHeight)
+                val bottom = ((column_index + 1) * tileHeight)
+
+                canvas?.drawRect(left, top, right, bottom, paintBackgroundClicked)
+
+            }
+        }
     }
 
     private fun drawBoard(canvas: Canvas){
@@ -93,13 +132,10 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
             if (tX < 5 && tY < 5){
 
-                 //Toast.makeText(
-                  //   (context as MainActivity),
-                  //   "Square$tX $tY ${mapViewModel.getFieldContent(tX,tY)}",
-                   //  Toast.LENGTH_LONG).show()
-                val b = mapViewModel.getFieldContent(tX, tY)
+
+
                 Toast.makeText((context as MainActivity), "$tX $tY", Toast.LENGTH_SHORT).show()
-                //call the function to calculate how many bombs are arround
+                mapViewModel.getFieldContent(tX, tY).wasClicked = true;
 
                 invalidate() // redraws the view, the onDraw(...) will be called
             }
