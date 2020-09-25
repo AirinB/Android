@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Minesweeper</string>
+    <string name="flag">Flag</string>
+    <string name="flag_on">Flag ON</string>
+    <string name="flag_off">Flag OFF</string>
+    <string name="mark_bombs">Mark Bombs</string>
+    <string name="empty" />
+    <string name="restart">Restart</string>
 </resources>

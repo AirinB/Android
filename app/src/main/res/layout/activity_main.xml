@@ -15,16 +15,24 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="    " />
+        android:text="@string/empty" />
+
 
     <Switch
         android:id="@+id/toggleBtn"
         android:layout_width="102dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
         android:checked="false"
         android:switchTextAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textOff="Try"
-        android:textOn="Flagg"
+        android:text="@string/mark_bombs"
+        android:textColor="@color/shrine_pink_900"
+        android:textColorHighlight="@color/shrine_pink_900"
+        android:textOff="@string/flag_off"
+        android:textOn="@string/flag_on"
+        android:textStyle="bold"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
     <LinearLayout
@@ -51,8 +59,12 @@
         android:layout_width="105dp"
         android:layout_height="wrap_content"
         android:soundEffectsEnabled="true"
-        android:text="Restart"
-
-        />
+        android:text="@string/restart"
+        android:background="@color/shrine_pink_50"
+        android:textColor="@color/shrine_pink_900"
+        android:padding="@dimen/cardview_default_elevation"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="20dp"
+        tools:ignore="PrivateResource" />
 
 </LinearLayout>

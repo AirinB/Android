@@ -1,5 +1,7 @@
 package com.example.minesweeper.model
 
+import android.util.Log
+
 object mapViewModel {
     val EMPTY: Short = 0
     val BOMB:  Short = 1
@@ -60,6 +62,7 @@ object mapViewModel {
                 isGameEnd = true
             }else{
                 checkedBombs += 1
+                Log.i("CHECKED BOMBS", "$checkedBombs")
                 if (checkedBombs == 4){
                     isGameEnd = true
                     isGameWon = true
@@ -80,6 +83,7 @@ object mapViewModel {
     fun resetModel() {
         isGameWon = false
         isGameEnd = false
+        checkedBombs = 0
         fieldMatrix  = arrayOf(
             arrayOf(
                 Field(EMPTY, 1, isFlagged = false, wasClicked = false),

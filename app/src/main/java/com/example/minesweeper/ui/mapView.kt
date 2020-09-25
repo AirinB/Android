@@ -3,12 +3,11 @@ package com.example.minesweeper.ui
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Toast
-import android.widget.Toast.makeText
-import com.example.minesweeper.MainActivity
 import com.example.minesweeper.R
+import com.example.minesweeper.model.Field
 import com.example.minesweeper.model.mapViewModel
 import com.example.minesweeper.model.mapViewModel.BOMB
 import com.example.minesweeper.model.mapViewModel.EMPTY
@@ -16,14 +15,6 @@ import com.example.minesweeper.model.mapViewModel.isGameEnd
 import com.example.minesweeper.model.mapViewModel.isGameOver
 import com.example.minesweeper.model.mapViewModel.resetModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_main.view.*
-
-
-//TODO
-// 5. if there is a mine draw another background
-// 7. put some icons (flaggs, mines)
-// 10. play with the style of the button
-
 
 
 class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
@@ -32,10 +23,14 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     var paintLine = Paint()
     var paintText = Paint()
     var paintBackgroundClicked = Paint()
-    var paintBackgroundFlagg = Paint()
-    var mine = BitmapFactory.decodeResource(
+    private var paintBackgroundFlag = Paint()
+    var mine: Bitmap = BitmapFactory.decodeResource(
         context?.resources,
         R.drawable.mine)
+
+    var flag: Bitmap = BitmapFactory.decodeResource(
+        context?.resources,
+        R.drawable.flag)
 
 
     init {
@@ -51,8 +46,9 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
         paintBackgroundClicked.color = Color.rgb(129, 240, 229)
         paintBackgroundClicked.style = Paint.Style.FILL
-        paintBackgroundFlagg.color = Color.rgb(154, 39, 90)
-        paintBackgroundFlagg.style = Paint.Style.FILL
+
+        paintBackgroundFlag.color = Color.rgb(154, 39, 90)
+        paintBackgroundFlag.style = Paint.Style.FILL
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -63,7 +59,7 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     override fun onDraw(canvas: Canvas) {
-        canvas?.drawRect(0f, 0f, width.toFloat(),
+        canvas.drawRect(0f, 0f, width.toFloat(),
             height.toFloat(), paintBackground)
 
 
@@ -72,17 +68,17 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     private fun drawClickedTiles(canvas: Canvas) {
-        //Y
+
         val tileHeight = height.toFloat()/5
-        //X
         val tileWidth = width.toFloat()/5
         val matrix = mapViewModel.fieldMatrix
 
         for(row_index in matrix.indices){
-            var row = matrix[row_index]
-            for (column_index in row.indices){
-                //draw filled rect
-                if(!matrix[row_index][column_index].wasClicked)
+            val row = matrix[row_index]
+            for (column_index in row.indices) {
+
+                //draw clicked rect
+                if (!matrix[row_index][column_index].wasClicked)
                     continue
 
 
@@ -91,22 +87,74 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
                 val top = (column_index * tileHeight)
                 val bottom = ((column_index + 1) * tileHeight)
 
-                    if (!matrix[row_index][column_index].isFlagged) {
-                        canvas?.drawRect(left, top, right, bottom, paintBackgroundClicked)
-                        if (matrix[row_index][column_index].minesAround != 0) {
-                            canvas.drawText(
-                                "${matrix[row_index][column_index].minesAround}",
-                                left + tileWidth / 3.toFloat(),
-                                bottom - tileHeight / 4.toFloat(),
-                                paintText
-                            )
-                        }
-                    }else{
-                        canvas?.drawRect(left, top, right, bottom, paintBackgroundFlagg)
-                    }
+                if (!matrix[row_index][column_index].isFlagged) {
+                    drawToggleOFF(
+                        canvas,
+                        left,
+                        top,
+                        right,
+                        bottom,
+                        matrix,
+                        row_index,
+                        column_index,
+                        tileWidth,
+                        tileHeight
+                    )
+                } else {
+                    drawToggleON(canvas, left, top, right, bottom)
                 }
+            }
 
 
+        }
+    }
+
+    private fun drawToggleON(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float
+    ) {
+        canvas.drawRect(left, top, right, bottom, paintBackgroundFlag)
+        canvas.drawBitmap(
+            flag,
+            left + width / 17.toFloat(),
+            top + height / 17.toFloat(),
+            null
+        )
+    }
+
+    private fun drawToggleOFF(
+        canvas: Canvas,
+        left: Float,
+        top: Float,
+        right: Float,
+        bottom: Float,
+        matrix: Array<Array<Field>>,
+        row_index: Int,
+        column_index: Int,
+        tileWidth: Float,
+        tileHeight: Float
+    ) {
+        canvas.drawRect(left, top, right, bottom, paintBackgroundClicked)
+        if (matrix[row_index][column_index].type == EMPTY &&
+            matrix[row_index][column_index].minesAround != 0
+        ) {
+            canvas.drawText(
+                "${matrix[row_index][column_index].minesAround}",
+                left + tileWidth / 3.toFloat(),
+                bottom - tileHeight / 4.toFloat(),
+                paintText
+            )
+        } else if (matrix[row_index][column_index].type == BOMB) {
+            canvas.drawRect(left, top, right, bottom, paintBackgroundFlag)
+            canvas.drawBitmap(
+                mine,
+                left + width / 18.toFloat(),
+                top + height / 18.toFloat(),
+                null
+            )
         }
     }
 
@@ -152,7 +200,7 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (isGameEnd)return true
         if (event?.action == MotionEvent.ACTION_DOWN) {
-            // 0,1; 0,2...
+
             val tX = event.x.toInt() / (width / 5)
             val tY = event.y.toInt() / (height / 5)
 
@@ -163,21 +211,10 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
                 if (mapViewModel.toggleOn) mapViewModel.getFieldContent(tX, tY).isFlagged = true
 
                 isGameOver(tX, tY)
+
                 invalidate() // redraws the view, the onDraw(...) will be called
-                if (mapViewModel.isGameEnd){
-                    var endgame = if (mapViewModel.isGameWon) "Won" else "Lost"
-                    Snackbar.make(
-                        this, "The game is ${endgame}", Snackbar.LENGTH_LONG
-                       ).setAction("Retry") {
-                        // Responds to click on the action
-                        resetModel()
-                        invalidate()
 
-                    }.setBackgroundTint(resources.getColor(R.color.backgroundTint))
-                        .setActionTextColor(resources.getColor(R.color.actionTextColor)).show()
-
-
-                }
+                drawEndGameMessage()
 
             }
         }
@@ -185,6 +222,23 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         return true
     }
 
+    private fun drawEndGameMessage() {
+        if (!isGameEnd)  return
+
+            val endgame = if (mapViewModel.isGameWon) "Won" else "Lost"
+
+            Snackbar.make(
+                this,
+                "The game is ${endgame}. Moraru Daniela Andreea ELYJ9R",
+                Snackbar.LENGTH_LONG
+            ).setAction("Retry") {
+                // Responds to click on the action
+                resetModel()
+                invalidate()
+
+            }.setBackgroundTint(resources.getColor(R.color.backgroundTint))
+                .setActionTextColor(resources.getColor(R.color.actionTextColor)).show()
+    }
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
