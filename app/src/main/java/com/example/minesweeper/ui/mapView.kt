@@ -2,10 +2,15 @@ package com.example.minesweeper.ui
 
 import android.content.Context
 import android.graphics.*
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat.getSystemService
+import com.example.minesweeper.MainActivity
 import com.example.minesweeper.R
 import com.example.minesweeper.model.Field
 import com.example.minesweeper.model.mapViewModel
@@ -15,8 +20,6 @@ import com.example.minesweeper.model.mapViewModel.isGameEnd
 import com.example.minesweeper.model.mapViewModel.isGameOver
 import com.example.minesweeper.model.mapViewModel.resetModel
 import com.google.android.material.snackbar.Snackbar
-
-
 class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     var paintBackground = Paint()
@@ -222,8 +225,10 @@ class mapView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
         return true
     }
 
+
     private fun drawEndGameMessage() {
         if (!isGameEnd)  return
+
 
             val endgame = if (mapViewModel.isGameWon) "Won" else "Lost"
 

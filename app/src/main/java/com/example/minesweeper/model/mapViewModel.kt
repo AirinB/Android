@@ -70,9 +70,11 @@ object mapViewModel {
             }
 
         }else{
+            //the game is lost
             if(field.type == BOMB){
                 isGameWon = false
                 isGameEnd = true
+
             }
         }
     }
